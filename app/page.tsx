@@ -20,7 +20,9 @@ import { useGlobalContextUpdate } from "./context/globalContext";
 
 export default function Home() {
   const { setActiveCityCoords } = useGlobalContextUpdate();
-  const [initialCityCoords, setInitialCityCoords] = useState(null);
+  const [initialCityCoords, setInitialCityCoords] = useState<number[] | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchInitialCoords = async () => {
@@ -38,7 +40,8 @@ export default function Home() {
     }
   }, [initialCityCoords, setActiveCityCoords]);
 
-  const getClickedCityCords = (lat, lon) => {
+  const getClickedCityCords = (lat: number, lon: number) => {
+    // Especifica los tipos aquí
     setActiveCityCoords([lat, lon]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
