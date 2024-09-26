@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import AirPollution from "./Components/AirPollution/AirPollution";
 import DailyForecast from "./Components/DailyForecast/DailyForecast";
@@ -19,14 +20,27 @@ import { useGlobalContextUpdate } from "./context/globalContext";
 
 export default function Home() {
   const { setActiveCityCoords } = useGlobalContextUpdate();
+  const [initialCityCoords, setInitialCityCoords] = useState(null);
 
-  const getClickedCityCords = (lat: number, lon: number) => {
+  useEffect(() => {
+    const fetchInitialCoords = async () => {
+      const response = await fetch("/api/getInitialCoords"); // Cambia esta URL según tu API
+      const data = await response.json();
+      setInitialCityCoords(data.coords);
+    };
+
+    fetchInitialCoords();
+  }, []);
+
+  useEffect(() => {
+    if (initialCityCoords) {
+      setActiveCityCoords(initialCityCoords);
+    }
+  }, [initialCityCoords, setActiveCityCoords]);
+
+  const getClickedCityCords = (lat, lon) => {
     setActiveCityCoords([lat, lon]);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -57,18 +71,14 @@ export default function Home() {
                 Top Large Cities
               </h2>
               <div className="flex flex-col gap-4">
-                {defaultStates.map((state, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="border rounded-lg cursor-pointer dark:bg-dark-grey shadow-sm dark:shadow-none"
-                      onClick={() => {
-                        getClickedCityCords(state.lat, state.lon);
-                      }}>
-                      <p className="px-6 py-4">{state.name}</p>
-                    </div>
-                  );
-                })}
+                {defaultStates.map((state, index) => (
+                  <div
+                    key={index}
+                    className="border rounded-lg cursor-pointer dark:bg-dark-grey shadow-sm dark:shadow-none"
+                    onClick={() => getClickedCityCords(state.lat, state.lon)}>
+                    <p className="px-6 py-4">{state.name}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -82,8 +92,8 @@ export default function Home() {
           <a
             href="https://www.linkedin.com/in/jefferson-alexander/"
             target="_blank"
-            className=" text-green-300 font-bold">
-           Jefferson Gudiel.
+            className="text-green-300 font-bold">
+            Jefferson Gudiel.
           </a>
         </p>
       </footer>
