@@ -25,9 +25,10 @@ export async function GET(req: NextRequest) {
     if (!dailyRes.ok) {
       const errorData = await dailyRes.json(); // Obtener detalles del error
       console.error("Error fetching daily data:", errorData);
-      return new NextResponse("Error fetching daily data", {
-        status: dailyRes.status,
-      });
+      return new NextResponse(
+        `Error fetching daily data: ${errorData.message}`,
+        { status: dailyRes.status }
+      );
     }
 
     const dailyData = await dailyRes.json();
