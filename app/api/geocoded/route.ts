@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const city = url.searchParams.get("search");
 
+    // Validar que el parámetro city esté presente
     if (!city) {
       return new Response("El parámetro de búsqueda es requerido", {
         status: 400,
@@ -17,7 +18,15 @@ export async function GET(req: NextRequest) {
 
     const geocodeUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${apiKey}`;
 
+    // Realizar la solicitud a la API de geocodificación
     const res = await axios.get(geocodeUrl);
+
+    // Verificar si la respuesta es correcta
+    if (res.status !== 200) {
+      return new Response("Error fetching geocoded data", {
+        status: res.status,
+      });
+    }
 
     return NextResponse.json(res.data);
   } catch (error) {

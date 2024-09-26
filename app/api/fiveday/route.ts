@@ -1,4 +1,3 @@
-import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -10,6 +9,7 @@ export async function GET(req: NextRequest) {
     const lat = url.searchParams.get("lat");
     const lon = url.searchParams.get("lon");
 
+    // Validar que lat y lon estén presentes
     if (!lat || !lon) {
       return new Response("Latitud y longitud son requeridas", { status: 400 });
     }
@@ -19,6 +19,13 @@ export async function GET(req: NextRequest) {
     const dailyRes = await fetch(dailyUrl, {
       next: { revalidate: 3600 },
     });
+
+    // Verificar si la respuesta es correcta
+    if (!dailyRes.ok) {
+      return new Response("Error fetching daily data", {
+        status: dailyRes.status,
+      });
+    }
 
     const dailyData = await dailyRes.json();
 

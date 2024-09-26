@@ -16,17 +16,20 @@ export async function GET(req: NextRequest) {
       return new Response("Missing latitude or longitude", { status: 400 });
     }
 
+    // Construir la URL para la API de OpenWeatherMap
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
+    // Realizar la solicitud a la API
     const res = await axios.get(weatherUrl);
 
-    // Verificar si la respuesta es correcta
+    // Verificar que la respuesta sea correcta antes de devolver
     if (res.status !== 200) {
       return new Response("Error fetching weather data", {
         status: res.status,
       });
     }
 
+    // Devolver la respuesta en formato JSON
     return NextResponse.json(res.data);
   } catch (error) {
     console.error("Error fetching forecast data:", error); // Imprimir error completo
