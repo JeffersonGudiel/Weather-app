@@ -11,27 +11,29 @@ export async function GET(req: NextRequest) {
 
     // Validar que lat y lon estén presentes
     if (!lat || !lon) {
-      return new Response("Latitud y longitud son requeridas", { status: 400 });
+      return new NextResponse("Latitud y longitud son requeridas", {
+        status: 400,
+      });
     }
 
-    const dailyUrl = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+    const dailyUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
-    const dailyRes = await fetch(dailyUrl, {
-      next: { revalidate: 3600 },
-    });
+    // Realizar la solicitud a la API
+    const dailyRes = await fetch(dailyUrl);
 
     // Verificar si la respuesta es correcta
     if (!dailyRes.ok) {
-      return new Response("Error fetching daily data", {
+      const errorData = await dailyRes.json(); // Obtener detalles del error
+      console.error("Error fetching daily data:", errorData);
+      return new NextResponse("Error fetching daily data", {
         status: dailyRes.status,
       });
     }
 
     const dailyData = await dailyRes.json();
-
     return NextResponse.json(dailyData);
   } catch (error) {
-    console.log("Error in getting daily data: ", error);
-    return new Response("Error in getting daily data", { status: 500 });
+    console.error("Error in getting daily data:", error);
+    return new NextResponse("Error in getting daily data", { status: 500 });
   }
 }

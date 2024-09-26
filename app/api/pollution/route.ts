@@ -10,25 +10,26 @@ export async function GET(req: NextRequest) {
 
     // Validar que los parámetros lat y lon estén presentes
     if (!lat || !lon) {
-      return new Response("Latitud y longitud son requeridas", { status: 400 });
+      return new NextResponse("Latitud y longitud son requeridas", {
+        status: 400,
+      });
     }
 
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
-    const pollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+    const pollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
     // Realizar la solicitud a la API de contaminación
     const res = await axios.get(pollutionUrl);
 
     // Verificar si la respuesta es correcta
     if (res.status !== 200) {
-      return new Response("Error fetching pollution data", {
-        status: res.status,
-      });
+      const errorMessage = res.data.message || "Error fetching pollution data"; // Obtener el mensaje de error si existe
+      return new NextResponse(errorMessage, { status: res.status });
     }
 
     return NextResponse.json(res.data);
   } catch (error) {
-    console.log("Error in getting pollution data: ", error);
-    return new Response("Error fetching pollution data", { status: 500 });
+    console.error("Error in getting pollution data: ", error); // Usar console.error para errores
+    return new NextResponse("Error fetching pollution data", { status: 500 });
   }
 }

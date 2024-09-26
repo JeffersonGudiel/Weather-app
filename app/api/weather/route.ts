@@ -13,7 +13,9 @@ export async function GET(req: NextRequest) {
 
     // Validar que los parámetros lat y lon estén presentes
     if (!lat || !lon) {
-      return new Response("Missing latitude or longitude", { status: 400 });
+      return new NextResponse("Latitud y longitud son requeridas", {
+        status: 400,
+      });
     }
 
     // Construir la URL para la API de OpenWeatherMap
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
 
     // Verificar que la respuesta sea correcta antes de devolver
     if (res.status !== 200) {
-      return new Response("Error fetching weather data", {
+      return new NextResponse("Error fetching weather data", {
         status: res.status,
       });
     }
@@ -32,7 +34,7 @@ export async function GET(req: NextRequest) {
     // Devolver la respuesta en formato JSON
     return NextResponse.json(res.data);
   } catch (error) {
-    console.error("Error fetching forecast data:", error); // Imprimir error completo
-    return new Response("Error fetching forecast data", { status: 500 });
+    console.error("Error fetching weather data:", error); // Imprimir error completo
+    return new NextResponse("Error fetching weather data", { status: 500 });
   }
 }
