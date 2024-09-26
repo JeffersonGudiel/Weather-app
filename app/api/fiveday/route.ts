@@ -5,10 +5,14 @@ export async function GET(req: NextRequest) {
   try {
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
-    const searchParams = req.nextUrl.searchParams;
+    // Obtener la URL completa de la solicitud
+    const url = new URL(req.url);
+    const lat = url.searchParams.get("lat");
+    const lon = url.searchParams.get("lon");
 
-    const lat = searchParams.get("lat");
-    const lon = searchParams.get("lon");
+    if (!lat || !lon) {
+      return new Response("Latitud y longitud son requeridas", { status: 400 });
+    }
 
     const dailyUrl = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
@@ -20,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(dailyData);
   } catch (error) {
-    console.log("Error in getting daily data ");
-    return new Response("Error in getting daily data ", { status: 500 });
+    console.log("Error in getting daily data: ", error);
+    return new Response("Error in getting daily data", { status: 500 });
   }
 }
